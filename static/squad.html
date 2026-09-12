@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squad Lab | Should Arteta Be Worried?</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/squad.css">
+</head>
+<body>
+
+    <section class="hero" style="padding: 2.5rem 1rem 1.5rem;">
+        <a href="/" class="hero-badge" style="text-decoration:none;">Back to Dashboard</a>
+        <h1>Squad <span>Lab</span></h1>
+        <p class="hero-sub">Swap players. See chemistry. Find the perfect signing.</p>
+    </section>
+
+    <div class="container">
+
+        <div class="squad-top-bar">
+            <div class="overall-chem">
+                <span class="overall-label">Team Chemistry</span>
+                <span class="overall-number" id="overall-chem">--</span>
+            </div>
+            <button class="reset-btn" id="reset-btn">Reset Squad</button>
+        </div>
+
+        <div class="pitch-wrapper">
+            <div class="pitch" id="pitch">
+                <svg class="chem-lines" id="chem-lines"></svg>
+            </div>
+        </div>
+
+        <!-- Swap panel (slides in when a player is clicked) -->
+        <div class="swap-panel" id="swap-panel">
+            <div class="swap-panel-header">
+                <h3 id="swap-title">Replace Player</h3>
+                <button class="swap-close" id="swap-close">&times;</button>
+            </div>
+
+            <div class="current-player-card" id="current-player-card"></div>
+
+            <h4 class="swap-section-title">Transfer Targets</h4>
+            <div class="candidate-list" id="candidate-list"></div>
+
+            <h4 class="swap-section-title">Squad Options</h4>
+            <div class="candidate-list" id="squad-options-list"></div>
+        </div>
+
+        <div class="swap-overlay" id="swap-overlay"></div>
+
+        <!-- Optimizer section -->
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h2>Optimize Transfers</h2>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <label class="overall-label" for="max-signings">Max signings:</label>
+                    <select id="max-signings" class="reset-btn" style="padding:0.4rem 0.6rem;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                    </select>
+                    <button class="optimize-btn" id="optimize-btn">Find Best Combo</button>
+                </div>
+            </div>
+            <p class="optimizer-desc">
+                Uses <strong>Branch and Bound</strong> on the squad chemistry graph. Positions are nodes,
+                chemistry scores are edge weights. The algorithm recursively explores all possible
+                signing combinations, pruning subtrees where an optimistic upper bound cannot beat the
+                current best solution. Shows nodes explored vs pruned so you can see the search efficiency.
+            </p>
+            <div id="optimize-results" class="optimize-results">
+                <p class="loading-text">Click "Find Best Combo" to run</p>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        Stats are illustrative. Based on FBref/StatsBomb style metrics.
+    </footer>
+
+    <script src="/static/squad.js"></script>
+</body>
+</html>

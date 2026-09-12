@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Should Arteta Be Worried?</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+
+    <section class="hero">
+        <div class="hero-badge">r/Gunners Sentiment Tracker</div>
+        <h1>Should <span>Arteta</span> Be Worried?</h1>
+        <p class="hero-sub">Fan sentiment scored in real time from Reddit</p>
+
+        <div class="worry-ring">
+            <svg viewBox="0 0 200 200">
+                <circle class="ring-bg" cx="100" cy="100" r="85" />
+                <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="85"
+                    stroke-dasharray="534" stroke-dashoffset="534" />
+            </svg>
+            <div class="ring-value">
+                <div class="ring-number" id="worry-number">--</div>
+                <div class="ring-label">Worry Index</div>
+            </div>
+        </div>
+
+        <div class="verdict" id="worry-verdict">Loading...</div>
+    </section>
+
+    <div class="container">
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Trend</h2>
+                <span class="card-stat" id="trend-range"></span>
+            </div>
+            <div class="chart-container">
+                <canvas id="trend-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Recent Results</h2>
+                </div>
+                <div class="match-list" id="match-list">
+                    <span class="loading-text">Loading...</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Sentiment by Topic</h2>
+                </div>
+                <div class="topics-grid" id="topics-grid">
+                    <span class="loading-text">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Latest Posts</h2>
+                <span class="card-stat" id="post-count"></span>
+            </div>
+            <ul class="post-list" id="post-list">
+                <li><span class="loading-text">Loading...</span></li>
+            </ul>
+        </div>
+
+    </div>
+
+    <footer>
+        Data from r/Gunners. Sentiment scored with VADER. Not affiliated with Arsenal FC.
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
