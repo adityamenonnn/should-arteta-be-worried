@@ -23,6 +23,7 @@ nltk.download("vader_lexicon", quiet=True)
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 from db import get_conn, init_db
+from sentiment_model import score_sentiment as model_score
 
 FEEDS = [
     "https://www.reddit.com/r/Gunners/new/.rss",
@@ -48,11 +49,14 @@ def fetch_posts_from_feed(url):
     for entry in root.findall(f"{{{ATOM_NS}}}entry"):
         # The entry ID is the full Reddit URL
         link_el = entry.find(f"{{{ATOM_NS}}}link")
-        post_url = link_el.get("href", "") if link_el is not None else ""
+        link_href = link_el.get("href", "") if link_el is not None else ""
 
         id_el = entry.find(f"{{{ATOM_NS}}}id")
-        post_id_raw = id_el.text if id_el is not None else post_url
+        post_id_raw = id_el.text if id_el is not None else link_href
         post_id = post_id_raw.rstrip("/").rsplit("/", 1)[-1] if "/" in post_id_raw else post_id_raw
+
+        # Use the full ID URL as the post link (it's the Reddit thread URL)
+        post_url = post_id_raw if post_id_raw.startswith("http") else link_href
 
         title = entry.find(f"{{{ATOM_NS}}}title").text or ""
         updated = entry.find(f"{{{ATOM_NS}}}updated").text
@@ -94,8 +98,11 @@ def fetch_all_posts():
 
 
 def score_sentiment(title):
-    """Return VADER compound score for a post title (-1 to 1)."""
-    return sia.polarity_scores(title)["compound"]
+    """Return sentiment score for a post title (-1 to 1).
+
+    Uses the trained classifier if available, otherwise falls back to VADER.
+    """
+    return model_score(title)
 
 
 def store_posts(posts):

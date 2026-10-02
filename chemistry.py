@@ -6,7 +6,10 @@ A high chemistry score means two players complement each other well.
 """
 
 import json
+import random
 from pathlib import Path
+
+import numpy as np
 
 DATA_PATH = Path(__file__).parent / "data" / "players.json"
 
@@ -426,4 +429,83 @@ def optimize_signings(base_squad, bench, targets, max_signings=3):
         "algorithm": "Branch and Bound",
         "nodes_explored": nodes_explored,
         "nodes_pruned": nodes_pruned,
+    }
+
+
+# --- Monte Carlo Simulation ---
+
+def _perturb_stats(player, noise_std=0.1):
+    """Create a copy of a player with Gaussian noise added to stats.
+
+    Simulates uncertainty in player performance. Each stat is perturbed
+    by a fraction of its value drawn from N(0, noise_std).
+    """
+    perturbed = dict(player)
+    perturbed["stats"] = {}
+    for stat, val in player["stats"].items():
+        lo, hi = STAT_RANGES.get(stat, (0, 1))
+        noise = random.gauss(0, noise_std * (hi - lo))
+        perturbed["stats"][stat] = max(lo, min(hi, val + noise))
+    return perturbed
+
+
+def monte_carlo_chemistry(squad, n_simulations=1000):
+    """Run Monte Carlo simulation on squad chemistry.
+
+    Adds Gaussian noise to player stats across N simulations to produce
+    a distribution of chemistry outcomes, quantifying uncertainty.
+
+    Returns:
+        dict with mean, std, percentiles, and per-link distributions
+    """
+    overall_scores = []
+    link_scores = {f"{a}-{b}": [] for a, b in LINKS if a in squad and b in squad}
+
+    for _ in range(n_simulations):
+        # Perturb all players
+        noisy_squad = {}
+        for pos, player in squad.items():
+            noisy_squad[pos] = _perturb_stats(player)
+
+        # Compute chemistry
+        links = get_squad_chemistry(noisy_squad)
+        avg = sum(l["score"] for l in links) / len(links) if links else 50
+        overall_scores.append(avg)
+
+        for link in links:
+            key = f"{link['from']}-{link['to']}"
+            if key in link_scores:
+                link_scores[key].append(link["score"])
+
+    overall = np.array(overall_scores)
+
+    # Per-link summary
+    link_summary = {}
+    for key, scores in link_scores.items():
+        if scores:
+            arr = np.array(scores)
+            link_summary[key] = {
+                "mean": round(float(arr.mean()), 1),
+                "std": round(float(arr.std()), 1),
+                "p5": round(float(np.percentile(arr, 5)), 1),
+                "p95": round(float(np.percentile(arr, 95)), 1),
+            }
+
+    # Build histogram bins for the frontend
+    hist_counts, hist_edges = np.histogram(overall, bins=20, range=(0, 100))
+
+    return {
+        "n_simulations": n_simulations,
+        "mean": round(float(overall.mean()), 1),
+        "std": round(float(overall.std()), 1),
+        "median": round(float(np.median(overall)), 1),
+        "p5": round(float(np.percentile(overall, 5)), 1),
+        "p25": round(float(np.percentile(overall, 25)), 1),
+        "p75": round(float(np.percentile(overall, 75)), 1),
+        "p95": round(float(np.percentile(overall, 95)), 1),
+        "histogram": {
+            "counts": hist_counts.tolist(),
+            "edges": [round(float(e), 1) for e in hist_edges.tolist()],
+        },
+        "links": link_summary,
     }

@@ -4,8 +4,10 @@ from fastapi import FastAPI, Query, Body
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from chemistry import load_players, get_squad_chemistry, rank_replacements, optimize_signings, LINKS
+from chemistry import load_players, get_squad_chemistry, rank_replacements, optimize_signings, monte_carlo_chemistry, LINKS
 from db import get_conn, init_db
+from forecast import build_forecast
+from sentiment_model import get_model_info
 
 app = FastAPI(title="Should Arteta Be Worried?")
 
@@ -144,6 +146,36 @@ def get_candidates(position: str):
         squad[p["position"]] = p
 
     return rank_replacements(position, squad, data["targets"])
+
+
+@app.get("/api/forecast")
+def get_forecast(days: int = Query(7, ge=1, le=30)):
+    """Predict the worry index for the next N days using Ridge regression."""
+    return build_forecast(days_ahead=days)
+
+
+@app.get("/api/model-info")
+def model_info():
+    """Return info about which sentiment model is active."""
+    return get_model_info()
+
+
+@app.post("/api/montecarlo")
+def run_montecarlo(squad: dict = Body(...)):
+    """Run Monte Carlo simulation on squad chemistry.
+
+    Adds Gaussian noise to player stats across 1000 simulations
+    to quantify uncertainty in chemistry scores.
+    """
+    data = load_players()
+    all_players = {p["id"]: p for p in data["arsenal"] + data.get("bench", []) + data.get("targets", [])}
+
+    resolved = {}
+    for pos, pid in squad.items():
+        if pid in all_players:
+            resolved[pos] = all_players[pid]
+
+    return monte_carlo_chemistry(resolved, n_simulations=1000)
 
 
 @app.post("/api/optimize")

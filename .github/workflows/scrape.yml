@@ -3,7 +3,7 @@ name: Scrape r/Gunners
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"  # every 6 hours
+    - cron: "0 */6 * * *"
 
 jobs:
   scrape:
@@ -22,12 +22,12 @@ jobs:
         run: python scraper.py
 
       - name: Fetch match results
-        run: python matches.py
+        run: python matches.py || echo "Match fetch skipped (API may need key)"
 
       - name: Commit updated database
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.db
+          git add -f data.db
           git diff --cached --quiet || git commit -m "Update data $(date -u +%Y-%m-%d_%H:%M)"
           git push

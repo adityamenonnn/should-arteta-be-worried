@@ -1,0 +1,8 @@
+{
+  "model_f1": 0.93,
+  "vader_f1": 0.751,
+  "improvement_pct": 18.0,
+  "train_size": 288,
+  "test_size": 72,
+  "total_samples": 360
+}

@@ -4,3 +4,4 @@ __pycache__/
 venv/
 nltk_data/
 data.db
+models/*.pkl

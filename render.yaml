@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: should-arteta-be-worried
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python3 -c "import nltk; nltk.download('vader_lexicon', quiet=True)"
+    startCommand: python3 -m uvicorn app:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"

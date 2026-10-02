@@ -9,73 +9,36 @@
 </head>
 <body>
 
-    <section class="hero">
-        <div class="hero-badge">r/Gunners Sentiment Tracker</div>
-        <h1>Should <span>Arteta</span> Be Worried?</h1>
-        <p class="hero-sub">Fan sentiment scored in real time from Reddit</p>
+    <h1>Should Arteta Be Worried?</h1>
+    <p class="subtitle">tracking what r/Gunners thinks, updated every 6 hours</p>
+    <nav><a href="/squad">squad lab</a></nav>
 
-        <div class="worry-ring">
-            <svg viewBox="0 0 200 200">
-                <circle class="ring-bg" cx="100" cy="100" r="85" />
-                <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="85"
-                    stroke-dasharray="534" stroke-dashoffset="534" />
-            </svg>
-            <div class="ring-value">
-                <div class="ring-number" id="worry-number">--</div>
-                <div class="ring-label">Worry Index</div>
-            </div>
+    <div class="worry-num" id="worry-number">--</div>
+    <p class="worry-verdict" id="worry-verdict"></p>
+
+    <h2>last 60 days</h2>
+    <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
+
+    <h2>forecast (next 7 days)</h2>
+    <p class="forecast-info" id="forecast-info"></p>
+    <div class="chart-wrap"><canvas id="forecast-chart"></canvas></div>
+    <p class="features" id="forecast-features"></p>
+
+    <div class="two-col">
+        <div>
+            <h2>recent results</h2>
+            <div class="matches" id="match-list"></div>
         </div>
-
-        <div class="verdict" id="worry-verdict">Loading...</div>
-    </section>
-
-    <div class="container">
-
-        <div class="card">
-            <div class="card-header">
-                <h2>Trend</h2>
-                <span class="card-stat" id="trend-range"></span>
-            </div>
-            <div class="chart-container">
-                <canvas id="trend-chart"></canvas>
-            </div>
+        <div>
+            <h2>by topic</h2>
+            <div class="topic-list" id="topic-list"></div>
         </div>
-
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Recent Results</h2>
-                </div>
-                <div class="match-list" id="match-list">
-                    <span class="loading-text">Loading...</span>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2>Sentiment by Topic</h2>
-                </div>
-                <div class="topics-grid" id="topics-grid">
-                    <span class="loading-text">Loading...</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>Latest Posts</h2>
-                <span class="card-stat" id="post-count"></span>
-            </div>
-            <ul class="post-list" id="post-list">
-                <li><span class="loading-text">Loading...</span></li>
-            </ul>
-        </div>
-
     </div>
 
-    <footer>
-        Data from r/Gunners. Sentiment scored with VADER. Not affiliated with Arsenal FC.
-    </footer>
+    <h2>posts <span id="post-count" style="color:#ccc"></span></h2>
+    <div class="posts" id="post-list"></div>
+
+    <footer id="footer"></footer>
 
     <script src="/static/app.js"></script>
 </body>
